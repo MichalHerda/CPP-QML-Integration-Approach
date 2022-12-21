@@ -1,2 +1,2 @@
-# My-First-QML-C-integration-approach
-Problem with QML/C++ communication, especially with passing function parameters from QML to C++ 
+# My_First_QML-C-_project_Integration
+# My_First_QML-C-_project_Integration
