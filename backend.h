@@ -2,53 +2,74 @@
 #define BACKEND_H
 
 #include <QObject>
+#include <QDebug>
+#include <QVector>
 #include <QtQml>
 #include <QtQml/qqmlregistration.h>
-#include <QVector>
-#include <QDebug>
+
+//gameboard size:
+#define BOARD 9
 
 class BackEnd : public QObject
 {
-    Q_OBJECT                                                                //
-    Q_PROPERTY(bool whose_move READ whose_move_read WRITE whose_move_change)// QML -> C++ integation macros
-    Q_PROPERTY(bool game_over READ game_over_read)                          // enable variables visibility in QML file
-    Q_PROPERTY(QVector <int> tile)
-    QML_ELEMENT                                                             //
-public:
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QVector <int> tile = {0, 0, 0, 0, 0, 0, 0, 0, 0};                       // gameboard representation
-                                                                            // with initialization inside class:
-                                                                            // 0 - null
-                                                                            // 1 - x
-                                                                            // 2 - o
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-    bool whose_move = true;                                                 // whose_move:  true: x   false: o
-    bool game_over = false;                                                 // true: move not available
-                                                                            // false: move available
+    Q_OBJECT
 
-    //functions existing to enable communication between QML and C++ :
-    bool game_over_read();
-    bool whose_move_read();
-//  int tile_read(QVector<int*>tile, int board_tile_index);                                                       //
-    void game_over_off();                                                   //
+ // QML => C++ integation macros
+ // enable variables visibility
+ // in QML file:
+
+    Q_PROPERTY(bool turn                READ turnRead          WRITE turnWrite          NOTIFY turnChanged         )
+    Q_PROPERTY(bool game_over           READ game_overRead     WRITE game_overWrite     NOTIFY game_overChanged    )
+    Q_PROPERTY(QVector<int>tile         READ tileRead          WRITE tileWrite          NOTIFY tileChanged         )
+    Q_PROPERTY(int magic_number         READ magic_numberRead  WRITE magic_numberWrite  NOTIFY magic_numberChanged )
+
+    QML_ELEMENT
+
+public:
+//variables :
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    QVector<int> tile  = QVector<int> (BOARD,0) ;                       // gameboard representation
+                                                                        // with initialization inside class (9 elements with 0 value):
+                                                                        // 0 - null
+                                                                        // 1 - x
+                                                                        // 2 - o
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool turn           = true;                                         // turn:  true: x   false: o
+    bool game_over      = true;                                         // true: move not available
+                                                                        // false: move available
+    int magic_number = 0;                                               // to select kind of line, drawing depending on situation on board, if player wins
+//line coordinates (properties to draw line in case of win):
+    QVector<int> coordinates = QVector<int> (4,0) ;
+
+//functions existing to enable communication between QML and C++ :
+
+   bool turnRead()const;
+
+       bool game_overRead()const;
+       void game_overWrite(bool game_over);
+           QVector<int> tileRead()const;
+           void tileWrite(QVector<int>tile);
+                int magic_numberRead()const;
+                void magic_numberWrite(int magic_number);
+
 //constructor:
 public:
     explicit BackEnd(QObject *parent = nullptr);
+
 //signals and slots:
 signals:
-    void new_game();
-    void whose_move_changing(bool whose_move);
-    void tile_clicked(int board_tile_index, bool whose_move, QVector <int> tile);
+    void turnChanged(bool turn);
+    void game_overChanged(bool game_over);
+    void tileChanged(QVector<int>tile);
+    void magic_numberChanged(int magic_number);
+
 public slots:
 //funtions descriptions in .cpp file
-    void clear_board(QVector <int> tile);
-    void change_tile_value(int board_tile_index, char player, QVector <int> tile);
-    bool check_for_win(char player, QVector <int> tile);
-    bool check_is_move_possible(QVector <int> tile);
-    void whose_move_change(bool whose_move);
-    void game_over_status(QVector <int> tile);
-
-    void actions_after_clicking(int board_tile_index, bool whose_move, QVector <int>  tile);
+    void clear_board(QVector<int> tile);
+    bool check_for_win(bool turn, QVector<int>tile);
+    bool check_is_move_possible(QVector<int>tile);
+    void change_tile_value(int index, bool turn);
+    void turnWrite(bool turn);
 
 };
 
