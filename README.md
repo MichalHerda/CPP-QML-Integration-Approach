@@ -1,2 +1,2 @@
-Trzeba jeszcze ten kod (QML) skrócić, używając COMPONENTS - do zrobienia za jakiś czas - będzie to odskocznia od następnego projektu
+I left this code in a public repository for historical and educational purposes. In the future, this design will be refined, especially the QML code
      
