@@ -54,8 +54,7 @@ void BackEnd::clear_board(QVector<int> tile)
  // Filling gameboard with "empty" values and also reset game variables below:
     this -> magic_number = 0;
     this -> turn = true;
-    for(int i = 0; i < BOARD; i++)
-            {
+    for(int i = 0; i < BOARD; i++) {
               this -> tile [i] = 0;
               qInfo() << "Empty tile no. " << i << ". Its value = " << tile [i];
             }
@@ -74,15 +73,9 @@ bool BackEnd::check_for_win(bool turn, QVector<int> tile)
     turn == true ? player = 1 : player = 2;
 //
     qInfo() << "Check For Win:";
-    qInfo() << "Tile 0 : " << tile[0];
-    qInfo() << "Tile 1 : " << tile[1];
-    qInfo() << "Tile 2 : " << tile[2];
-    qInfo() << "Tile 3 : " << tile[3];
-    qInfo() << "Tile 4 : " << tile[4];
-    qInfo() << "Tile 5 : " << tile[5];
-    qInfo() << "Tile 6 : " << tile[6];
-    qInfo() << "Tile 7 : " << tile[7];
-    qInfo() << "Tile 8 : " << tile[8];
+    for(int i = 0; i < BOARD; i++) {
+    qInfo() << "Tile " << i << " : " << tile[i];
+    }
 //
     if      ( (tile[0] == player) && (tile[1] == player) && (tile[2] == player) )
     { qInfo() << "Player " << player << "wins!"; game_overWrite(game_over); this -> magic_number = 1; return true; }

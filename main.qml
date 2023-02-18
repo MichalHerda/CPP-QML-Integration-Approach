@@ -11,12 +11,12 @@ ApplicationWindow {
         color: "darkslategrey"
         title: qsTr("Noughts And Crosses")
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        property color rectColor: "lightblue"
-        property color borderColor: "black"
-        property color areaColor: "blue"
+        property color rectColor:     "lightblue"
+        property color borderColor:   "black"
+        property color areaColor:     "blue"
         property color repeaterColor: "orange"
         property color indicateColor: "red"
-        property color linesColor: "gold"
+        property color linesColor:    "gold"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     BackEnd {
         id: back                                                                           // BackEnd item
@@ -26,78 +26,44 @@ ApplicationWindow {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////PLAYER INDICATOR AREA///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Rectangle {
-        id: uprec1
-        color: rectColor
-        border.color: borderColor
-        border.width: 7
-        x: 15
-        y: 15
-        width: 130
-        height: 100
-           TextField {
-                id: textField1
-                readOnly: true
-                background: Rectangle {
-                        color: rectColor
+    Repeater {
+            id: playerAreaRep
+            model: 2
+            delegate: Rectangle {
+                id: playerAreaElement
+                x: 15 + (index * 140)
+                y: 15
+                width: 130
+                height: 100
+                color: rectColor
+                border {color: borderColor; width: 7}
+
+                Repeater {
+                    id: textRepeater
+                    model: ListModel {
+                        ListElement {txt: "PLAYER X"; q: 18}
+                        ListElement {txt: "PLAYER O"; q: 18}
+                        ListElement {txt: "   PRESS" ; q: 60}
+                        ListElement {txt: "  START!" ; q: 60}
+                        ListElement {txt: "    TURN" ; q: 60}
+                        ListElement {txt: "   WINS!" ; q: 60}
+                        ListElement {txt: "    DRAW" ; q: 60}
                     }
-                font.bold: true
-                x: 15
-                y: 14
-                width: 98
-                height: 29
-                placeholderText: qsTr("   PLAYER X")
-            }
-            TextField {
-                id: textField3
-                readOnly: true
-                background: Rectangle {
-                        color: rectColor
+                    delegate: Text {
+                        id: textRepeaterElement
+                        x: 18
+                        y: q
+                        font {bold: true; pointSize: 15}
+                        text: txt
+                        visible: false
                     }
-                font.bold: true
-                x: 15
-                y: 57
-                width: 98
-                height: 29
-                placeholderText: qsTr("      PRESS")
-            }
-        }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Rectangle {
-        id: uprec2
-        color: rectColor
-        border.color: borderColor
-        border.width: 7
-        x: 155
-        y: 15
-        width: 130
-        height: 100
-        visible: true
-            TextField {
-                id: textField2
-                readOnly: true
-                background: Rectangle {
-                        color: rectColor
-                    }
-                font.bold: true
-                x: 15
-                y: 14
-                width: 98
-                height: 29
-                placeholderText: qsTr("   PLAYER O")
-            }
-            TextField {
-                id: textField4
-                readOnly: true
-                background: Rectangle {
-                        color: rectColor
-                    }
-                font.bold: true
-                x: 15
-                y: 57
-                width: 98
-                height: 29
-                placeholderText: qsTr("     START!")
+                }
+                Component.onCompleted: {
+                    playerAreaRep.itemAt(0).children[0].visible = true
+                    playerAreaRep.itemAt(0).children[2].visible = true
+                    playerAreaRep.itemAt(1).children[1].visible = true
+                    playerAreaRep.itemAt(1).children[3].visible = true
+                }
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +72,7 @@ ApplicationWindow {
     Rectangle {
         id: area
         color: "blue"
-        border.color: borderColor
+        border.color: borderColor                                                   //game board
         border.width: 3
         x: 15
         y: 129
@@ -115,7 +81,7 @@ ApplicationWindow {
 
         Repeater{
             id: repeax
-            model: 9
+            model: 9                                                                // game grid as 9 rectangles repeat
             delegate: Rectangle {
                 id: tileElement
                 x: (index % 3) * area.width/3
@@ -128,8 +94,8 @@ ApplicationWindow {
                 property bool vis2: false
                 property bool vis3: false
 
-                Image {
-                    id: image1
+                Image {                                                             // images: empty, cross, nought
+                    id: image1                                                      // good place to create List Element :)
                     width: tileElement.width/1.2
                     height: tileElement.height/1.2
                     visible: parent.vis1
@@ -166,8 +132,12 @@ ApplicationWindow {
                            back.check_for_win(back.turn,back.tile);
                            if(back.check_for_win) {
                                for(let i = 1; i <= 8; i++ ) {
-                                   if(back.magic_number === i) {
+                                   if(back.magic_number === i) {                                        // display line if winning
                                        linesRep.itemAt(i - 1).visible = true;
+                                       playerAreaRep.itemAt(0).children[2].visible = true
+                                       playerAreaRep.itemAt(1).children[3].visible = true
+                                       playerAreaRep.itemAt(0).children[4].visible = false
+                                       playerAreaRep.itemAt(1).children[4].visible = false
                                        back.game_overWrite(game_over);
                                    }
                                }
@@ -178,16 +148,16 @@ ApplicationWindow {
                            console.log("check is move possible = ",back.check_is_move_possible(back.tile))
                            if(back.check_is_move_possible) {
                                if(back.turn) {
-                                   textField3.text = "       TURN";
-                                   textField4.text = " ";
-                                   uprec1.border.color = indicateColor;
-                                   uprec2.border.color = borderColor;
+                                   playerAreaRep.itemAt(0).children[4].visible = true                   // this code appears also below
+                                   playerAreaRep.itemAt(1).children[4].visible = false                  // make function!
+                                   playerAreaRep.itemAt(0).border.color = indicateColor;
+                                   playerAreaRep.itemAt(1).border.color = borderColor;
                                 }
                                else {
-                                   textField4.text = "       TURN";
-                                   textField3.text = " ";
-                                   uprec1.border.color = borderColor;
-                                   uprec2.border.color = indicateColor;
+                                   playerAreaRep.itemAt(0).children[4].visible = false
+                                   playerAreaRep.itemAt(1).children[4].visible = true
+                                   playerAreaRep.itemAt(0).border.color = borderColor;
+                                   playerAreaRep.itemAt(1).border.color = indicateColor;
                                 }
                             }
                         }
@@ -205,13 +175,13 @@ ApplicationWindow {
                 id: linesRep
                 model: ListModel {
                     ListElement { p:10 ; q:40 ; w:250; h:10 ; o:0   }
-                    ListElement { p:10 ; q:130; w:250; h:10 ; o:0   }
-                    ListElement { p:10 ; q:220; w:250; h:10 ; o:0   }
+                    ListElement { p:10 ; q:130; w:250; h:10 ; o:0   }                       // lines coordination
+                    ListElement { p:10 ; q:220; w:250; h:10 ; o:0   }                       // don't touch - FRAGILE
                     ListElement { p:40 ; q:10 ; w:10 ; h:250; o:0   }
                     ListElement { p:130; q:10 ; w:10 ; h:250; o:0   }
                     ListElement { p:220; q:10 ; w:10 ; h:250; o:0   }
-                    ListElement { p:125; q:-15; w:10 ; h:320; o:135 }
-                    ListElement { p:115; q:-15; w:10 ; h:320; o:45  }
+                    ListElement { p:125; q:-28; w:10 ; h:320; o:135 }
+                    ListElement { p:125; q:-18; w:10 ; h:320; o:45  }
                 }
                 delegate: Rectangle {
                     x: p
@@ -251,26 +221,27 @@ ApplicationWindow {
                     repeax.itemAt(i).vis3 = false
 
                     if(i < 8) {
-                        console.log(i," visible: ",linesRep.itemAt(i).visible)
-                        linesRep.itemAt(i).visible = false
+                        console.log(i," visible: ",linesRep.itemAt(i).visible)                          // clear board from lines
+                        linesRep.itemAt(i).visible = false                                              // after winning game
                     }
                 }
                     back.game_over = true
                     back.clear_board(back.tile)
-                    textField3.text = "       TURN"
-                    textField4.text = " "
+                    playerAreaRep.itemAt(0).children[2].visible = false
+                    playerAreaRep.itemAt(1).children[3].visible = false
+
 
                 if(back.turn) {
-                    textField3.text = "       TURN";                                                    // indicate
-                    textField4.text = " ";                                                              // whose
-                    uprec1.border.color = indicateColor;                                                // turn
-                    uprec2.border.color = borderColor;
+                    playerAreaRep.itemAt(0).children[4].visible = true                                  // indicate
+                    playerAreaRep.itemAt(1).children[4].visible = false                                 // whose
+                    playerAreaRep.itemAt(0).border.color = indicateColor;                               // turn
+                    playerAreaRep.itemAt(1).border.color = borderColor;
                 }
                 else {
-                    textField4.text = "       TURN";
-                    textField3.text = " ";
-                    uprec1.border.color = borderColor;
-                    uprec2.border.color = indicateColor;
+                    playerAreaRep.itemAt(0).children[4].visible = false
+                    playerAreaRep.itemAt(1).children[4].visible = true
+                    playerAreaRep.itemAt(0).border.color = borderColor;
+                    playerAreaRep.itemAt(1).border.color = indicateColor;
                 }
             }
         }
