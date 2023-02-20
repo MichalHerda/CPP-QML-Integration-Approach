@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import NoughtsAndCrosses 1.0
+import "jsBackEnd.js" as Js
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ApplicationWindow {
         maximumWidth: 300
@@ -23,9 +24,7 @@ ApplicationWindow {
         onTurnChanged:          (turn) => {                                                // Enable reading C++ functions
                        }                                                                   // From main.qml level
         }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////PLAYER INDICATOR AREA///////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------PLAYER INDICATOR AREA------------------------------------------------------------------
     Repeater {
             id: playerAreaRep
             model: 2
@@ -59,16 +58,11 @@ ApplicationWindow {
                     }
                 }
                 Component.onCompleted: {
-                    playerAreaRep.itemAt(0).children[0].visible = true
-                    playerAreaRep.itemAt(0).children[2].visible = true
-                    playerAreaRep.itemAt(1).children[1].visible = true
-                    playerAreaRep.itemAt(1).children[3].visible = true
+                   Js.initialState (playerAreaRep)
                 }
             }
         }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////GAME-BOARD///////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------GAME-BOARD--------------------------------------------------------------------
     Rectangle {
         id: area
         color: "blue"
@@ -122,55 +116,41 @@ ApplicationWindow {
                     anchors.fill: tileElement
                     onClicked: {
                         if( (!back.game_over) && (back.tile[index] === 0) ) {
-                           repeax.itemAt(index).vis1 = false
+                           repeax.itemAt (index).vis1 = false
                            if(back.turn)
-                               repeax.itemAt(index).vis2 = true
+                               repeax.itemAt (index).vis2 = true
                            else
                                repeax.itemAt(index).vis3 = true
 
-                           back.change_tile_value(index,back.turn);
-                           back.check_for_win(back.turn,back.tile);
+                           back.change_tile_value (index,back.turn);
+                           back.check_for_win (back.turn,back.tile);
                            if(back.check_for_win) {
                                for(let i = 1; i <= 8; i++ ) {
-                                   if(back.magic_number === i) {                                        // display line if winning
-                                       linesRep.itemAt(i - 1).visible = true;
-                                       playerAreaRep.itemAt(0).children[2].visible = true
-                                       playerAreaRep.itemAt(1).children[3].visible = true
-                                       playerAreaRep.itemAt(0).children[4].visible = false
-                                       playerAreaRep.itemAt(1).children[4].visible = false
+                                   if(back.magic_number === i) {
+                                       Js.drawLine(i, playerAreaRep, linesRep)                                 // display line if winning
                                        back.game_overWrite(game_over);
                                    }
                                }
                            }
-                           back.check_is_move_possible(back.tile);
-                           console.log("check for win = ", back.check_for_win(back.turn,back.tile));
+                           back.check_is_move_possible(back.tile);                           
                            back.turnWrite(back.turn)
-                           console.log("check is move possible = ",back.check_is_move_possible(back.tile))
                            if(back.check_is_move_possible) {
                                if(back.turn) {
-                                   playerAreaRep.itemAt(0).children[4].visible = true                   // this code appears also below
-                                   playerAreaRep.itemAt(1).children[4].visible = false                  // make function!
-                                   playerAreaRep.itemAt(0).border.color = indicateColor;
-                                   playerAreaRep.itemAt(1).border.color = borderColor;
+                                   Js.indicateXturn(playerAreaRep, indicateColor, borderColor)
                                 }
                                else {
-                                   playerAreaRep.itemAt(0).children[4].visible = false
-                                   playerAreaRep.itemAt(1).children[4].visible = true
-                                   playerAreaRep.itemAt(0).border.color = borderColor;
-                                   playerAreaRep.itemAt(1).border.color = indicateColor;
+                                   Js.indicateYturn(playerAreaRep, indicateColor, borderColor)
                                 }
                             }
                         }
                        else {
-                           console.log("PRESS START")
+                           Js.initialState (playerAreaRep)
                         }
                     }
                 }
             }
         }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////LINES///////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------LINES----------------------------------------------------------------------
         Repeater {
                 id: linesRep
                 model: ListModel {
@@ -194,9 +174,7 @@ ApplicationWindow {
                 }
             }
         }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////BOTTOM_AREA//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------BOTTOM_AREA--------------------------------------------------------------------
     Rectangle {
         color: rectColor
         border.color: borderColor
@@ -215,33 +193,17 @@ ApplicationWindow {
             text: qsTr("Start/Restart Game")
 
             onClicked: {
-                for(let i = 0; i < 9; i++) {
-                    repeax.itemAt(i).vis1 = true
-                    repeax.itemAt(i).vis2 = false
-                    repeax.itemAt(i).vis3 = false
+                Js.clearLinesAndBoard(repeax, linesRep)
 
-                    if(i < 8) {
-                        console.log(i," visible: ",linesRep.itemAt(i).visible)                          // clear board from lines
-                        linesRep.itemAt(i).visible = false                                              // after winning game
-                    }
-                }
                     back.game_over = true
                     back.clear_board(back.tile)
-                    playerAreaRep.itemAt(0).children[2].visible = false
-                    playerAreaRep.itemAt(1).children[3].visible = false
-
+                    Js.pressStartClear(playerAreaRep)
 
                 if(back.turn) {
-                    playerAreaRep.itemAt(0).children[4].visible = true                                  // indicate
-                    playerAreaRep.itemAt(1).children[4].visible = false                                 // whose
-                    playerAreaRep.itemAt(0).border.color = indicateColor;                               // turn
-                    playerAreaRep.itemAt(1).border.color = borderColor;
+                    Js.indicateXturn(playerAreaRep, indicateColor, borderColor)
                 }
                 else {
-                    playerAreaRep.itemAt(0).children[4].visible = false
-                    playerAreaRep.itemAt(1).children[4].visible = true
-                    playerAreaRep.itemAt(0).border.color = borderColor;
-                    playerAreaRep.itemAt(1).border.color = indicateColor;
+                    Js.indicateYturn(playerAreaRep, indicateColor, borderColor)
                 }
             }
         }

@@ -22,6 +22,7 @@ qt_add_qml_module(appNoughtsAndCrosses
     QML_FILES main.qml
         backend.h
         backend.cpp
+        jsBackEnd.js
 )
 
 set_target_properties(appNoughtsAndCrosses PROPERTIES
@@ -38,5 +39,4 @@ target_link_libraries(appNoughtsAndCrosses
 install(TARGETS appNoughtsAndCrosses
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
 
