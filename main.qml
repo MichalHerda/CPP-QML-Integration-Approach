@@ -40,8 +40,8 @@ ApplicationWindow {
                 Repeater {
                     id: textRepeater
                     model: ListModel {
-                        ListElement {txt: "PLAYER X"; q: 18}
-                        ListElement {txt: "PLAYER O"; q: 18}
+                        ListElement {txt: "PLAYER X" ; q: 18}
+                        ListElement {txt: "PLAYER O" ; q: 18}
                         ListElement {txt: "   PRESS" ; q: 60}
                         ListElement {txt: "  START!" ; q: 60}
                         ListElement {txt: "    TURN" ; q: 60}
@@ -84,46 +84,36 @@ ApplicationWindow {
                 height: area.height/3
                 color: repeaterColor
                 border {color: borderColor; width: tileElement.width/20}
-                property bool vis1: true
-                property bool vis2: false
-                property bool vis3: false
 
-                Image {                                                             // images: empty, cross, nought
-                    id: image1                                                      // good place to create List Element :)
-                    width: tileElement.width/1.2
-                    height: tileElement.height/1.2
-                    visible: parent.vis1
-                    anchors.centerIn: parent
-                    source: "qrc:/Images/empty.png"
-                   }
-                Image {
-                    id: image2
-                    width: tileElement.width/1.2
-                    height: tileElement.height/1.2
-                    visible: parent.vis2
-                    anchors.centerIn: parent
-                    source: "qrc:/Images/cross.png"
-                   }
-                Image {
-                    id: image3
-                    width: tileElement.width/1.2
-                    height: tileElement.height/1.2
-                    visible: parent.vis3
-                    anchors.centerIn: parent
-                    source: "qrc:/Images/nought.png"
-                   }
+                Repeater {
+                    id: tileRepeater
+                    model: ListModel {
+                        ListElement {src: "qrc:/Images/empty.png" ; vis: true }
+                        ListElement {src: "qrc:/Images/cross.png" ; vis: false}
+                        ListElement {src: "qrc:/Images/nought.png"; vis: false}
+                    }
+                    delegate: Image {
+                        id: tileRepeaterElement
+                        width: tileElement.width/1.2
+                        height: tileElement.height/1.2
+                        anchors.centerIn: parent
+                        source: src
+                        visible: vis
+                    }
+                }
+
                 MouseArea {
                     anchors.fill: tileElement
                     onClicked: {
                         if( (!back.game_over) && (back.tile[index] === 0) ) {
-                           repeax.itemAt (index).vis1 = false
+                           repeax.itemAt(index).children[0].visible = false
                            if(back.turn)
-                               repeax.itemAt (index).vis2 = true
+                               repeax.itemAt(index).children[1].visible = true
                            else
-                               repeax.itemAt(index).vis3 = true
+                               repeax.itemAt(index).children[2].visible = true
 
-                           back.change_tile_value (index,back.turn);
-                           back.check_for_win (back.turn,back.tile);
+                           back.change_tile_value (index, back.turn);
+                           back.check_for_win (back.turn, back.tile);
                            if(back.check_for_win) {
                                for(let i = 1; i <= 8; i++ ) {
                                    if(back.magic_number === i) {
@@ -132,14 +122,14 @@ ApplicationWindow {
                                    }
                                }
                            }
-                           back.check_is_move_possible(back.tile);                           
-                           back.turnWrite(back.turn)
+                           back.check_is_move_possible (back.tile);
+                           back.turnWrite (back.turn)
                            if(back.check_is_move_possible) {
                                if(back.turn) {
-                                   Js.indicateXturn(playerAreaRep, indicateColor, borderColor)
+                                   Js.indicateXturn (playerAreaRep, indicateColor, borderColor)
                                 }
                                else {
-                                   Js.indicateYturn(playerAreaRep, indicateColor, borderColor)
+                                   Js.indicateYturn (playerAreaRep, indicateColor, borderColor)
                                 }
                             }
                         }
@@ -190,20 +180,20 @@ ApplicationWindow {
             y: 15
             width: 185
             height: 40
-            text: qsTr("Start/Restart Game")
+            text: qsTr ("Start/Restart Game")
 
             onClicked: {
-                Js.clearLinesAndBoard(repeax, linesRep)
+                Js.clearLinesAndBoard (repeax, linesRep)
 
                     back.game_over = true
-                    back.clear_board(back.tile)
-                    Js.pressStartClear(playerAreaRep)
+                    back.clear_board (back.tile)
+                    Js.pressStartClear (playerAreaRep)
 
                 if(back.turn) {
-                    Js.indicateXturn(playerAreaRep, indicateColor, borderColor)
+                    Js.indicateXturn (playerAreaRep, indicateColor, borderColor)
                 }
                 else {
-                    Js.indicateYturn(playerAreaRep, indicateColor, borderColor)
+                    Js.indicateYturn (playerAreaRep, indicateColor, borderColor)
                 }
             }
         }

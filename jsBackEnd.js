@@ -14,9 +14,9 @@ function indicateYturn(playerAreaRep, indicateColor, BorderColor) {
 
 function clearLinesAndBoard (repeax, linesRep) {
     for(let i = 0; i < 9; i++) {
-        repeax.itemAt(i).vis1 = true
-        repeax.itemAt(i).vis2 = false
-        repeax.itemAt(i).vis3 = false
+        repeax.itemAt(i).children[0].visible = true
+        repeax.itemAt(i).children[1].visible = false
+        repeax.itemAt(i).children[2].visible = false
 
         if(i < 8) {
             console.log(i," visible: ",linesRep.itemAt(i).visible)                          // clear board from lines
