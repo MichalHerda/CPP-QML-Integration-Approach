@@ -57,6 +57,28 @@ ApplicationWindow {
                         visible: false
                     }
                 }
+
+                PropertyAnimation {
+                        id: animation
+                        target: playerAreaElement.border
+                        property: "color"
+                        from: "black"
+                        to: "orange"
+                        duration: 150
+                        loops: Animation.Infinite
+                        running: false
+                    }
+                Connections {
+                        target: back
+                        function onGame_overChanged() {
+                            if (back.game_over) {
+                                animation.running = true
+                            }
+                            else {
+                                animation.running = false
+                            }
+                        }
+                    }
                 Component.onCompleted: {
                    Js.initialState (playerAreaRep)
                 }
@@ -118,7 +140,7 @@ ApplicationWindow {
                                for(let i = 1; i <= 8; i++ ) {
                                    if(back.magic_number === i) {
                                        Js.drawLine(i, playerAreaRep, linesRep)                                 // display line if winning
-                                       back.game_overWrite(game_over);
+                                       back.game_overWrite(back.game_over);
                                    }
                                }
                            }
